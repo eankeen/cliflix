@@ -187,6 +187,7 @@ function initPrompt() {
 
 function initLocale() {
   const locale = osLocale.sync().replace('_', '-'),
+    // @ts-ignore
     languageName = localeCode.getLanguageName(locale),
     language = Config.subtitles.languages.available.find((language) =>
       language.startsWith(languageName)
