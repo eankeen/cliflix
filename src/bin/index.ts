@@ -2,8 +2,8 @@
 
 /* IMPORT */
 
-import CLI from '../cli';
+import CLI from '../cli'
 
 /* CLI */
 
-CLI ();
+CLI()

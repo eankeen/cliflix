@@ -1,18 +1,17 @@
-
 /* IMPORT */
 
-import * as temp from 'temp';
+import * as temp from 'temp'
 
 /* TEMP */
 
-temp.track ();
+temp.track()
 
 /* EXIT */
 
-const exitEvents: any[] = ['exit', 'SIGINT', 'SIGTERM'];
+const exitEvents: any[] = ['exit', 'SIGINT', 'SIGTERM']
 
-exitEvents.forEach ( e => {
-  process.on ( e, () => {
-    temp.cleanupSync ()
-  });
-});
+exitEvents.forEach((e) => {
+  process.on(e, () => {
+    temp.cleanupSync()
+  })
+})
