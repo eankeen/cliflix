@@ -27,9 +27,10 @@ const CLIFlix = {
         Config.subtitles.languages.favorites.length) &&
       !Utils.webtorrent.options.isSubtitlesSet(webtorrentOptions)
     ) {
-      const subbed = await prompt.noYes('Do you want subtitles?')
+      // const subbed = await prompt.noYes('Do you want subtitles?')
 
-      if (subbed) {
+      // if (subbed) {
+      if (true) {
         const languageName = await prompt.list(
             'Which language?',
             Utils.prompt.parseList(
