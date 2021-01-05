@@ -8,8 +8,8 @@ It searches a torrent for you and streams it using [WebTorrent](https://github.c
 
 ## Install
 
-```shell
-$ npm install -g cliflix
+```sh
+$ pnpm install -g cliflix
 ```
 
 ## Usage

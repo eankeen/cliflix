@@ -1,19 +1,14 @@
-/* IMPORT */
-
 import * as _ from 'lodash'
 import chalk from 'chalk'
-import * as execa from 'execa'
+import execa from 'execa'
 import * as OpenSubtitles from 'opensubtitles-api'
 import * as parseTorrent from 'parse-torrent'
 import * as path from 'path'
 import prompt from 'inquirer-helpers'
-import * as torrentSearch from 'torrent-search-api'
-import * as ora from 'ora'
-import Config from './config'
+import torrentSearch from 'torrent-search-api'
+import ora from 'ora'
+import { Config } from './config'
 import Utils from './utils'
-import './temp'
-
-/* CLIFIX */
 
 const CLIFlix = {
   async wizard(webtorrentOptions: string[] = []) {
@@ -59,6 +54,7 @@ const CLIFlix = {
             ),
             stream = await Utils.subtitles.download(subtitles)
 
+          if (Buffer.isBuffer(stream.path)) stream.path = stream.path.toString()
           Utils.webtorrent.options.setSubtitles(webtorrentOptions, stream.path)
         }
       }
@@ -142,6 +138,7 @@ const CLIFlix = {
 
       return torrents
     } catch (e) {
+      console.debug(e)
       spinner.stop()
 
       console.error(
@@ -216,7 +213,5 @@ const CLIFlix = {
     execa.sync('webtorrent', execArgs, execOpts)
   },
 }
-
-/* EXPORT */
 
 export default CLIFlix

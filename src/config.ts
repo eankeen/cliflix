@@ -1,18 +1,14 @@
-/* IMPORT */
-
 import * as _ from 'lodash'
 import chalk from 'chalk'
-import * as fs from 'fs'
 import * as JSON5 from 'json5'
-import * as localeCode from 'locale-code'
-import * as os from 'os'
+import localeCode from 'locale-code'
 import * as osLocale from 'os-locale'
-import * as path from 'path'
+import path from 'path'
+import fs from 'fs'
+import os from 'os'
 import prompt from 'inquirer-helpers'
 
-/* CONFIG */
-
-const Config = {
+export const Config = {
   localConfigPath: path.join(os.homedir(), '.cliflix.json'),
   downloads: {
     path: path.join(os.homedir(), 'Downloads'),
@@ -178,8 +174,6 @@ const Config = {
   },
 }
 
-/* INIT */
-
 function initPrompt() {
   prompt.FULLSCREEN = Config.prompt.fullscreen
   prompt.PAGE_SIZE = Config.prompt.rows
@@ -231,7 +225,3 @@ function initLocalConfig() {
 initLocale()
 initLocalConfig()
 initPrompt()
-
-/* EXPORT */
-
-export default Config

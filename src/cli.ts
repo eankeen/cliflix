@@ -1,15 +1,11 @@
-/* IMPORT */
-
 import * as _ from 'lodash'
-import * as caporal from 'caporal'
-import * as readPkg from 'read-pkg-up'
-import * as updateNotifier from 'update-notifier'
-import Utils from './utils'
+import caporal from 'caporal'
+import readPkg from 'read-pkg-up'
+import updateNotifier from 'update-notifier'
+import * as utils from './utils'
 import CLIFlix from '.'
 
-/* CLI */
-
-async function CLI() {
+export async function cli() {
   process.on('SIGINT', () => process.exit(1)) // Force quitting
 
   const { pkg } = await readPkg({ cwd: __dirname })
@@ -19,13 +15,13 @@ async function CLI() {
     .argument('[title|torrent]', 'Video title or torrent identifier')
     .argument('[-- webtorrent options...]', 'WebTorrent options')
     .action(async (args) => {
-      await Utils.checkConnection()
+      await utils.checkConnection()
 
       updateNotifier({ pkg }).notify()
 
       args = _.castArray(args.titleTorrent || []).concat(args.webtorrentOptions)
 
-      const doubleDashIndex = args.findIndex((x) => x === '--'),
+      const doubleDashIndex = args.findIndex((x: any) => x === '--'),
         hasWebtorrentOptions = doubleDashIndex >= 0,
         queryOrTorrent = hasWebtorrentOptions
           ? args.slice(0, doubleDashIndex).join(' ')
@@ -41,7 +37,3 @@ async function CLI() {
 
   caporal.parse(process.argv)
 }
-
-/* EXPORT */
-
-export default CLI

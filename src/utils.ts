@@ -1,30 +1,24 @@
-/* IMPORT */
-
 import * as _ from 'lodash'
 import chalk from 'chalk'
-import * as filesizeParser from 'filesize-parser'
+import filesizeParser from 'filesize-parser'
 import * as fs from 'fs'
 import * as inquirer from 'inquirer'
 import * as path from 'path'
 import prompt from 'inquirer-helpers'
-import * as isOnline from 'is-online'
+import isOnline from 'is-online'
 import * as prettySize from 'prettysize'
 import * as request from 'request-promise-native'
 import * as temp from 'temp'
-import Config from './config'
+import { Config } from './config'
 
-/* UTILS */
+export async function checkConnection() {
+  const online = await isOnline()
+
+  if (!online)
+    throw new Error(chalk.red('Looks like you are offline, try again later.\n'))
+}
 
 const Utils = {
-  async checkConnection() {
-    const online = await isOnline()
-
-    if (!online)
-      throw new Error(
-        chalk.red('Looks like you are offline, try again later.\n')
-      )
-  },
-
   prompt: {
     parseList(list: string[], favorites: string[] = []) {
       list = _.difference(list, favorites)
@@ -128,6 +122,7 @@ const Utils = {
           ? fs.createWriteStream(path.join(Config.downloads.path, filename))
           : temp.createWriteStream()
 
+      console.info(content)
       stream.write(content)
       stream.end()
 
