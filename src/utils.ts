@@ -11,14 +11,16 @@ import * as request from 'request-promise-native'
 import * as temp from 'temp'
 import { Config } from './config'
 
-export async function checkConnection() {
-  const online = await isOnline()
+export const utils = {
+  async checkConnection() {
+    const online = await isOnline()
 
-  if (!online)
-    throw new Error(chalk.red('Looks like you are offline, try again later.\n'))
-}
+    if (!online)
+      throw new Error(
+        chalk.red('Looks like you are offline, try again later.\n')
+      )
+  },
 
-const Utils = {
   prompt: {
     parseList(list: string[], favorites: string[] = []) {
       list = _.difference(list, favorites)
@@ -44,13 +46,13 @@ const Utils = {
       titles.forEach((title) => {
         const row: string[] = []
 
-        row.push(Utils.torrent.parseTitle(title.title))
+        row.push(utils.torrent.parseTitle(title.title))
 
         if (Config.torrents.details.seeders && hasSeeders) row.push(title.seeds)
         if (Config.torrents.details.leechers && hasLeechers)
           row.push(title.peers)
         if (Config.torrents.details.size && hasSize)
-          row.push(Utils.torrent.parseSize(title.size))
+          row.push(utils.torrent.parseSize(title.size))
         if (Config.torrents.details.time && hasTime) row.push(title.time)
 
         table.push(row)
@@ -76,7 +78,7 @@ const Utils = {
       subtitlesAll.forEach((subtitles) => {
         const row: string[] = []
 
-        row.push(Utils.subtitles.parseTitle(subtitles.filename))
+        row.push(utils.subtitles.parseTitle(subtitles.filename))
 
         if (Config.subtitles.details.downloads) row.push(subtitles.downloads)
 
@@ -141,23 +143,23 @@ const Utils = {
       },
 
       isAppSet(options: string[]) {
-        return Utils.webtorrent.options.isOptionSet(
+        return utils.webtorrent.options.isOptionSet(
           options,
-          Utils.webtorrent.options.appRe
+          utils.webtorrent.options.appRe
         )
       },
 
       isSubtitlesSet(options: string[]) {
-        return Utils.webtorrent.options.isOptionSet(
+        return utils.webtorrent.options.isOptionSet(
           options,
-          Utils.webtorrent.options.subtitlesRe
+          utils.webtorrent.options.subtitlesRe
         )
       },
 
       isOutSet(options: string[]) {
-        return Utils.webtorrent.options.isOptionSet(
+        return utils.webtorrent.options.isOptionSet(
           options,
-          Utils.webtorrent.options.outRe
+          utils.webtorrent.options.outRe
         )
       },
 
@@ -183,11 +185,11 @@ const Utils = {
         /* ENSURING NO DUPLICATE --APP SWITCH */
 
         if (
-          Utils.webtorrent.options.isAppSet(dynamics) &&
-          Utils.webtorrent.options.isAppSet(defaults)
+          utils.webtorrent.options.isAppSet(dynamics) &&
+          utils.webtorrent.options.isAppSet(defaults)
         ) {
           defaults = defaults.filter(
-            (option) => !option.match(Utils.webtorrent.options.appRe)
+            (option) => !option.match(utils.webtorrent.options.appRe)
           )
         }
 
@@ -200,9 +202,9 @@ const Utils = {
         if (
           (Config.outputs.available.length ||
             Config.outputs.favorites.length) &&
-          !Utils.webtorrent.options.isAppSet(dynamics)
+          !utils.webtorrent.options.isAppSet(dynamics)
         ) {
-          options = Utils.webtorrent.options.setApp(
+          options = utils.webtorrent.options.setApp(
             dynamics,
             Config.outputs.favorites[0] || Config.outputs.available[0]
           )
@@ -210,12 +212,12 @@ const Utils = {
 
         /* ENSURING --OUT SETTING */
 
-        if (!Utils.webtorrent.options.isOutSet(options)) {
+        if (!utils.webtorrent.options.isOutSet(options)) {
           const outPath = Config.downloads.save
             ? Config.downloads.path
             : temp.mkdirSync('cliflix-')
 
-          options = Utils.webtorrent.options.setOut(options, outPath)
+          options = utils.webtorrent.options.setOut(options, outPath)
         }
 
         /* RETURN */
@@ -386,13 +388,13 @@ const Utils = {
     ],
 
     getCode(name) {
-      const { codes, names } = Utils.language
+      const { codes, names } = utils.language
 
       return codes[_.indexOf(names, name)]
     },
 
     getName(code) {
-      const { codes, names } = Utils.language
+      const { codes, names } = utils.language
 
       return names[_.indexOf(codes, code)]
     },
@@ -401,4 +403,4 @@ const Utils = {
 
 /* EXPORT */
 
-export default Utils
+export default utils

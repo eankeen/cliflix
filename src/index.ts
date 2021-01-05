@@ -8,7 +8,7 @@ import prompt from 'inquirer-helpers'
 import torrentSearch from 'torrent-search-api'
 import ora from 'ora'
 import { Config } from './config'
-import Utils from './utils'
+import { utils } from './utils'
 
 const CLIFlix = {
   async wizard(webtorrentOptions: string[] = []) {
@@ -20,7 +20,7 @@ const CLIFlix = {
     if (
       (Config.subtitles.languages.available.length ||
         Config.subtitles.languages.favorites.length) &&
-      !Utils.webtorrent.options.isSubtitlesSet(webtorrentOptions)
+      !utils.webtorrent.options.isSubtitlesSet(webtorrentOptions)
     ) {
       // const subbed = await prompt.noYes('Do you want subtitles?')
 
@@ -28,12 +28,12 @@ const CLIFlix = {
       if (true) {
         const languageName = await prompt.list(
             'Which language?',
-            Utils.prompt.parseList(
+            utils.prompt.parseList(
               Config.subtitles.languages.available,
               Config.subtitles.languages.favorites
             )
           ),
-          languageCode = Utils.language.getCode(languageName),
+          languageCode = utils.language.getCode(languageName),
           spinner = ora(
             `Waiting for "${chalk.bold('OpenSubtitles')}"...`
           ).start(),
@@ -48,31 +48,31 @@ const CLIFlix = {
 
           if (!okay) return
         } else {
-          const subtitles = await Utils.prompt.subtitles(
+          const subtitles = await utils.prompt.subtitles(
               'Which subtitles?',
               subtitlesAll
             ),
-            stream = await Utils.subtitles.download(subtitles)
+            stream = await utils.subtitles.download(subtitles)
 
           if (Buffer.isBuffer(stream.path)) stream.path = stream.path.toString()
-          Utils.webtorrent.options.setSubtitles(webtorrentOptions, stream.path)
+          utils.webtorrent.options.setSubtitles(webtorrentOptions, stream.path)
         }
       }
     }
 
     if (
       (Config.outputs.available.length || Config.outputs.favorites.length) &&
-      !Utils.webtorrent.options.isAppSet(webtorrentOptions)
+      !utils.webtorrent.options.isAppSet(webtorrentOptions)
     ) {
       const app = await prompt.list(
         'Which app?',
-        Utils.prompt.parseList(
+        utils.prompt.parseList(
           Config.outputs.available,
           Config.outputs.favorites
         )
       )
 
-      webtorrentOptions = Utils.webtorrent.options.setApp(
+      webtorrentOptions = utils.webtorrent.options.setApp(
         webtorrentOptions,
         app
       )
@@ -171,7 +171,7 @@ const CLIFlix = {
         continue
       }
 
-      return await Utils.prompt.title('Which torrent?', torrents)
+      return await utils.prompt.title('Which torrent?', torrents)
     }
   },
 
@@ -199,7 +199,7 @@ const CLIFlix = {
   },
 
   async stream(torrent, webtorrentOptions: string[] = []) {
-    webtorrentOptions = Utils.webtorrent.options.parse(
+    webtorrentOptions = utils.webtorrent.options.parse(
       webtorrentOptions,
       Config.webtorrent.options
     )

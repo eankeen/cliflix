@@ -2,7 +2,7 @@ import * as _ from 'lodash'
 import caporal from 'caporal'
 import readPkg from 'read-pkg-up'
 import updateNotifier from 'update-notifier'
-import * as utils from './utils'
+import { utils } from './utils'
 import CLIFlix from '.'
 
 export async function cli() {
