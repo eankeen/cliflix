@@ -10,7 +10,7 @@ import ora from 'ora'
 import { Config } from './config'
 import { utils } from './utils'
 
-const CLIFlix = {
+export const CLIFlix = {
   async wizard(webtorrentOptions: string[] = []) {
     const torrent = await CLIFlix.getTorrent(),
       magnet = await CLIFlix.getMagnet(torrent)
@@ -207,11 +207,10 @@ const CLIFlix = {
     const execArgs = ['download', torrent, ...webtorrentOptions],
       execOpts = {
         cwd: path.resolve(__dirname, '..'),
-        stdio: 'inherit',
+        // @ts-ignore
+        stdio: 'inherit' as 'inherit',
       }
 
     execa.sync('webtorrent', execArgs, execOpts)
   },
 }
-
-export default CLIFlix

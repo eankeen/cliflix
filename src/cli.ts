@@ -3,21 +3,21 @@ import caporal from 'caporal'
 import readPkg from 'read-pkg-up'
 import updateNotifier from 'update-notifier'
 import { utils } from './utils'
-import CLIFlix from '.'
+import { CLIFlix } from './index'
 
 export async function cli() {
   process.on('SIGINT', () => process.exit(1)) // Force quitting
 
-  const { pkg } = await readPkg({ cwd: __dirname })
+  const { packageJson } = await readPkg({ cwd: __dirname })
 
   caporal
-    .version(pkg.version)
+    .version(packageJson.version)
     .argument('[title|torrent]', 'Video title or torrent identifier')
     .argument('[-- webtorrent options...]', 'WebTorrent options')
     .action(async (args) => {
       await utils.checkConnection()
 
-      updateNotifier({ pkg }).notify()
+      updateNotifier({ pkg: packageJson }).notify()
 
       args = _.castArray(args.titleTorrent || []).concat(args.webtorrentOptions)
 
