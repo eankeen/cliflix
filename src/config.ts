@@ -1,15 +1,25 @@
-import * as _ from 'lodash'
-import chalk from 'chalk'
-import * as JSON5 from 'json5'
-import localeCode from 'locale-code'
-import * as osLocale from 'os-locale'
 import path from 'path'
 import fs from 'fs'
 import os from 'os'
+import _ from 'lodash'
+import c from 'ansi-colors'
+import JSON5 from 'json5'
+import localeCode from 'locale-code'
+import osLocale from 'os-locale'
+
 import prompt from 'inquirer-helpers'
 
+function getCfg(): string {
+  let cfg: string
+  if (process.env.XDG_CONFIG_HOME && process.env.XDG_CONFIG_HOME !== '') {
+    cfg = process.env.XDG_CONFIG_HOME
+  }
+  cfg = path.join(process.env.HOME as string, '.config')
+  return path.join(cfg, 'cliflix.json')
+}
+
 export const Config = {
-  localConfigPath: path.join(os.homedir(), '.cliflix.json'),
+  localConfigPath: getCfg(),
   downloads: {
     path: path.join(os.homedir(), 'Downloads'),
     save: true,
@@ -180,12 +190,11 @@ function initPrompt() {
 }
 
 function initLocale() {
-  const locale = osLocale.sync().replace('_', '-'),
-    // @ts-ignore
-    languageName = localeCode.getLanguageName(locale),
-    language = Config.subtitles.languages.available.find((language) =>
-      language.startsWith(languageName)
-    )
+  const locale = osLocale.sync().replace('_', '-')
+  const languageName = localeCode.getLanguageName(locale)
+  const language = Config.subtitles.languages.available.find((language) =>
+    language.startsWith(languageName)
+  )
 
   if (!language) return
 
@@ -207,8 +216,8 @@ function initLocalConfig() {
 
     if (_.isError(localConfig)) {
       console.error(
-        chalk.red(
-          `Error reading the configuration file (${chalk.bold(
+        c.red(
+          `Error reading the configuration file (${c.bold(
             Config.localConfigPath
           )}). Is it properly formatted JSON?`
         )

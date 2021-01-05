@@ -1,9 +1,9 @@
-import * as _ from 'lodash'
-import chalk from 'chalk'
+import path from 'path'
+import fs from 'fs'
+import _ from 'lodash'
+import c from 'ansi-colors'
 import filesizeParser from 'filesize-parser'
-import * as fs from 'fs'
 import * as inquirer from 'inquirer'
-import * as path from 'path'
 import prompt from 'inquirer-helpers'
 import isOnline from 'is-online'
 import * as prettySize from 'prettysize'
@@ -11,14 +11,24 @@ import * as request from 'request-promise-native'
 import * as temp from 'temp'
 import { Config } from './config'
 
+function getDownloadsPath(
+  Config: Record<string, any>
+  // args?: {
+  //   [k: string]: any
+  // }
+) {
+  // if (args.outputDir) {
+  //   return args.outputDir
+  // }
+  return Config.downloads.path
+}
+
 export const utils = {
   async checkConnection() {
     const online = await isOnline()
 
     if (!online)
-      throw new Error(
-        chalk.red('Looks like you are offline, try again later.\n')
-      )
+      throw new Error(c.red('Looks like you are offline, try again later.\n'))
   },
 
   prompt: {
@@ -121,7 +131,7 @@ export const utils = {
     async download({ url, filename }) {
       const content = await request(url),
         stream = Config.downloads.save
-          ? fs.createWriteStream(path.join(Config.downloads.path, filename))
+          ? fs.createWriteStream(path.join(getDownloadsPath(Config), filename))
           : temp.createWriteStream()
 
       console.info(content)
@@ -212,13 +222,20 @@ export const utils = {
 
         /* ENSURING --OUT SETTING */
 
+        console.info(options, 'a', dynamics, 'b', defaults)
         if (!utils.webtorrent.options.isOutSet(options)) {
-          const outPath = Config.downloads.save
-            ? Config.downloads.path
+          let outPath = Config.downloads.save
+            ? getDownloadsPath(Config)
             : temp.mkdirSync('cliflix-')
 
           options = utils.webtorrent.options.setOut(options, outPath)
         }
+
+        if (dynamics.includes('--outputDir')) {
+          const outPath = dynamics[dynamics.indexOf('--outputDir') + 1]
+          options = utils.webtorrent.options.setOut(options, outPath)
+        }
+        console.info(options)
 
         /* RETURN */
 

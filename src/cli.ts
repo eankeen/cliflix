@@ -1,39 +1,68 @@
-import * as _ from 'lodash'
-import caporal from 'caporal'
 import readPkg from 'read-pkg-up'
-import updateNotifier from 'update-notifier'
 import { utils } from './utils'
 import { CLIFlix } from './index'
+import yargs from 'yargs'
 
 export async function cli() {
-  process.on('SIGINT', () => process.exit(1)) // Force quitting
+  process.on('SIGINT', () => process.exit(1))
 
+  // @ts-ignore
   const { packageJson } = await readPkg({ cwd: __dirname })
 
-  caporal
-    .version(packageJson.version)
-    .argument('[title|torrent]', 'Video title or torrent identifier')
-    .argument('[-- webtorrent options...]', 'WebTorrent options')
-    .action(async (args) => {
-      await utils.checkConnection()
-
-      updateNotifier({ pkg: packageJson }).notify()
-
-      args = _.castArray(args.titleTorrent || []).concat(args.webtorrentOptions)
-
-      const doubleDashIndex = args.findIndex((x: any) => x === '--'),
-        hasWebtorrentOptions = doubleDashIndex >= 0,
-        queryOrTorrent = hasWebtorrentOptions
-          ? args.slice(0, doubleDashIndex).join(' ')
-          : args.join(' '),
-        webtorrentOptions = hasWebtorrentOptions
-          ? args.slice(doubleDashIndex + 1)
-          : []
-
-      if (!queryOrTorrent) return CLIFlix.wizard(webtorrentOptions)
-
-      return CLIFlix.lucky(queryOrTorrent, webtorrentOptions)
+  yargs
+    .scriptName('cliflix')
+    .usage('$0 <cmd> [args]')
+    .command({
+      command: '*',
+      handler: (argv) => {
+        if (argv._[0]) {
+          console.log('Unknown commmand', argv._[0])
+          return
+        }
+        console.info(argv)
+        const webtorrentOptions = []
+        CLIFlix.wizard(webtorrentOptions)
+      },
+    })
+    .command({
+      command: 'torrent <torrent>',
+      describe: 'Use torrent',
+      handler: (argv) => {
+        console.info(argv)
+        const webtorrentOptions = []
+        // CLIFlix.lucky(queryOrTorrent, webtorrentOptions)
+      },
+    })
+    .command({
+      command: 'title <title>',
+      describe: 'Use title',
+      handler: (argv) => {
+        console.info(argv)
+        const webtorrentOptions = []
+        // CLIFlix.lucky(queryOrTorrent, webtorrentOptions)
+      },
     })
 
-  caporal.parse(process.argv)
+    .option('activeTorrentProvider', {
+      type: 'string',
+      describe:
+        'Torrent providers: 1337x|ThePirateBay|ExtraTorrent|Rarbg|Torrent9|KickassTorrents|TorrentProject|Torrentz2',
+    })
+    .option('outputDir', {
+      type: 'string',
+      describe: 'Directory to output files. Same as "downloads.path"',
+    })
+    .option('movieFile', {
+      type: 'string',
+      describe: 'Name of output movie file',
+    })
+    .option('subtitleFile', {
+      type: 'string',
+    })
+    .example('$0', 'Launches cliflix wizard')
+    .alias('help', 'h')
+    .alias('version', 'v')
+    .strict()
+    .strictCommands()
+    .strictOptions().argv
 }
