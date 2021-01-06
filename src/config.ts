@@ -12,23 +12,12 @@ function getCfg(): string {
 
 export const Config = {
   localConfigPath: getCfg(),
-  downloads: {
-    path: path.join(os.homedir(), 'Downloads'),
-    save: true,
-  },
+
+  activeLanguage: '',
+  downloadSave: true,
+  downloadPath: path.join(os.homedir(), 'Downloads'),
+
   outputs: {
-    supported: [
-      'Airplay',
-      'Chromecast',
-      'DLNA',
-      'MPlayer',
-      'mpv',
-      'omx',
-      'VLC',
-      'IINA',
-      'XBMC',
-      'stdout',
-    ],
     available: [
       'Airplay',
       'Chromecast',
@@ -47,9 +36,10 @@ export const Config = {
       seeders: true,
       leechers: true,
       size: true,
-      time: false,
+      time: true,
     },
     providers: {
+      active: '1337x',
       available: [
         '1337x',
         'ThePirateBay',
@@ -60,13 +50,20 @@ export const Config = {
         'TorrentProject',
         'Torrentz2',
       ],
-      active: '1337x',
     },
+  },
+  prompt: {
+    fullscreen: true,
+    rows: 10,
   },
   subtitles: {
     limit: 30,
-    details: {
-      downloads: true,
+    showDownloads: true,
+    opensubtitles: {
+      useragent: 'PlayMe v1',
+      username: null,
+      password: null,
+      ssl: true,
     },
     languages: {
       available: [
@@ -152,26 +149,11 @@ export const Config = {
         'English',
         'French',
         'German',
-        'Hindi',
         'Italian',
         'Japanese',
-        'Portuguese',
         'Russian',
         'Spanish',
       ],
     },
-    opensubtitles: {
-      useragent: 'PlayMe v1',
-      username: null,
-      password: null,
-      ssl: true,
-    },
-  },
-  webtorrent: {
-    options: [],
-  },
-  prompt: {
-    fullscreen: true,
-    rows: 10,
   },
 }

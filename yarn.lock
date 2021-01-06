@@ -94,11 +94,6 @@
     "@types/node" "*"
     "@types/responselike" "*"
 
-"@types/filesize-parser@^1.5.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@types/filesize-parser/-/filesize-parser-1.5.0.tgz#4d8596b6cefafd7d7d6fed1fc6f7d6d6030c89a1"
-  integrity sha512-stFet/86Fo0OYeFLpZzmizITQljuDNt1oaNsKQFFLpfLUBAIcwLWC3KwvNmCSrLgfA2SghB86oO/zyFkYE6+rQ==
-
 "@types/http-cache-semantics@*":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/http-cache-semantics/-/http-cache-semantics-4.0.0.tgz#9140779736aa2655635ee756e2467d787cfe8a2a"

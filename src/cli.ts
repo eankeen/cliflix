@@ -22,12 +22,12 @@ export async function cli() {
       },
     })
     .command({
-      command: 'do <param>',
+      command: 'do <doArg>',
       handler: (argv) => {
         util.checkConnection()
 
         const webtorrentOptions = []
-        CLIFlix.lucky(argv.param, webtorrentOptions)
+        CLIFlix.do(argv, webtorrentOptions)
       },
     })
     .option('activeTorrentProvider', {
@@ -35,19 +35,28 @@ export async function cli() {
       describe:
         'Torrent providers: 1337x|ThePirateBay|ExtraTorrent|Rarbg|Torrent9|KickassTorrents|TorrentProject|Torrentz2',
     })
+    .option('activeOutputProgram', {
+      type: 'string',
+      describe:
+        'App to play the movie with: VLC|Airplay|Chromecase|DLNA|MPlayer|mpv|IINA|XBMC',
+    })
+    .option('title', {
+      type: 'string',
+      describe: 'Name of movie / media you want to watch',
+    })
     .option('outputDir', {
       type: 'string',
       describe: 'Directory to output files. Same as "downloads.path"',
     })
-    .option('movieFile', {
-      type: 'string',
-      describe: 'Name of output movie file',
-    })
-    .option('subtitleFile', {
-      type: 'string',
-    })
-    .option('noSubtitles', {
+    .option('subtitles', {
       type: 'boolean',
+      describe: 'Download and use subtitles',
+      default: true,
+    })
+    .option('autosubtitles', {
+      type: 'boolean',
+      describe:
+        'Automatically pick the most downloaded subtitles. Also skips the "No subtitles, continue?" menu branch',
       default: false,
     })
     .example('$0', 'Launches cliflix wizard')

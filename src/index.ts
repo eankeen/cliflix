@@ -9,19 +9,43 @@ import parseTorrent from 'parse-torrent'
 import prompts from 'prompts'
 import torrentSearch from 'torrent-search-api'
 import prompt from 'inquirer-helpers'
+import fs from 'fs'
+import temp from 'temp'
+import fetch from 'node-fetch'
 
 import * as lang from './lang'
 import { Config } from './config'
-import * as subtitleUtils from './utils/subtitles'
-import * as webtorrentUtils from './utils/webtorrent'
 import * as promptUtils from './utils/prompt'
+import { getDownloadsDir } from './utils'
 
-async function getMagnet(torrent: any) {
+async function getMagnet(torrent: any): Promise<string> {
   try {
     return await torrentSearch.getMagnet(torrent)
   } catch (err) {
-    console.error(c.yellow('getMagent error. Ignoring'))
-    return
+    console.error(c.yellow('getMagent error. Exiting'))
+    console.error(err)
+    process.exit(1)
+  }
+}
+
+async function getTorrent(argv: yargs.Arguments) {
+  while (true) {
+    const query = argv.title
+      ? argv.title
+      : await prompt.input('What do you want to watch?')
+    const provider = argv.activeTorrentProvider
+      ? (argv.activeTorrentProvider as string)
+      : Config.torrents.providers.active
+    const torrents = await getTorrents(query, Config.torrents.limit, provider)
+
+    if (!torrents.length) {
+      console.error(
+        c.yellow(`No torrents found for "${c.bold(query)}", try another query.`)
+      )
+      continue
+    }
+
+    return await promptUtils.title('Which torrent?', torrents)
   }
 }
 
@@ -88,79 +112,79 @@ async function getTorrents(
   }
 }
 
-async function getTorrent(argv: yargs.Arguments) {
-  while (true) {
-    const query = await prompt.input('What do you want to watch?')
-    const torrents = await getTorrents(
-      query,
-      Config.torrents.limit,
-      argv.activeTorrentProvider as string
-    )
-
-    if (!torrents.length) {
-      console.error(
-        c.yellow(`No torrents found for "${c.bold(query)}", try another query.`)
-      )
-
-      continue
-    }
-
-    return await promptUtils.title('Which torrent?', torrents)
-  }
-}
-
 export const CLIFlix = {
   async wizard(argv: yargs.Arguments, webtorrentOptions: string[] = []) {
+    // GET TORRENT
     const torrent = await getTorrent(argv)
+
+    // GET MAGENET
     const magnet = await getMagnet(torrent)
-    if (!magnet) return console.error(c.red('Magnet not found.'))
+    if (!torrent) return console.error(c.red('Magnet not found.'))
 
-    if (!webtorrentUtils.isOptionSet(webtorrentOptions, /^--subtitles$/i)) {
-      if (!argv.noSubtitles) {
-        const languageName = await prompt.list(
-          'Which language?',
-          promptUtils.parseList(
-            Config.subtitles.languages.available,
-            Config.subtitles.languages.favorites
-          )
-        )
-        const languageCode = lang.getCode(languageName)
-        const spinner = ora(
-          `Waiting for "${c.bold('OpenSubtitles')}"...`
-        ).start()
-        const subtitlesAll = await getSubtitles(torrent.title, languageCode)
+    // SET SUBTITLES
+    if (argv.subtitles) {
+      const languageName =
+        Config.activeLanguage && Config.activeLanguage.length > 1
+          ? Config.activeLanguage
+          : await prompt.list(
+              'Which language?',
+              promptUtils.parseList(
+                Config.subtitles.languages.available,
+                Config.subtitles.languages.favorites
+              )
+            )
+      const languageCode = lang.getCode(languageName)
+      const spinner = ora(`Waiting for "${c.bold('OpenSubtitles')}"...`).start()
+      const subtitlesAll = await getSubtitles(torrent.title, languageCode)
 
-        spinner.stop()
+      spinner.stop()
 
-        if (!subtitlesAll.length) {
-          const res = await prompts({
-            type: 'confirm',
-            name: 'ok',
-            initial: true,
-            message: `No subtitles found for "${languageName}", play it anyway?`,
-          })
+      if (!subtitlesAll.length && !argv.autosubtitles) {
+        const res = await prompts({
+          type: 'confirm',
+          name: 'ok',
+          initial: true,
+          message: `No subtitles found for "${languageName}", play it anyway?`,
+        })
 
-          if (res.ok === false) {
-            console.log(c.green('Exiting.'))
-            return
-          }
+        if (res.ok === false) {
+          console.log(c.green('Exiting.'))
+          return
+        }
+      } else {
+        let subtitles: Record<string, any>
+        if (argv.autosubtitles) {
+          subtitles = subtitlesAll[0]
         } else {
-          const subtitles = await promptUtils.subtitles(
+          subtitles = await promptUtils.subtitles(
             'Which subtitles?',
             subtitlesAll
           )
-          const stream = await subtitleUtils.download(subtitles)
-
-          if (Buffer.isBuffer(stream.path)) stream.path = stream.path.toString()
-          webtorrentOptions.push('--subtitles', stream.path)
         }
+
+        // DOWNLOAD SUBTITLES
+        let stream: fs.WriteStream
+        {
+          const { url, filename } = subtitles
+          const content = await (await fetch(url)).text()
+          stream = Config.downloadSave
+            ? fs.createWriteStream(path.join(getDownloadsDir(Config), filename))
+            : temp.createWriteStream()
+
+          stream.write(content)
+          stream.end()
+        }
+
+        webtorrentOptions.push('--subtitles', stream.path.toString())
       }
     }
 
-    if (
-      (Config.outputs.available.length || Config.outputs.favorites.length) &&
-      !webtorrentUtils.isAppSet(webtorrentOptions)
-    ) {
+    // SET APP
+    if (argv.activeOutputProgram) {
+      webtorrentOptions.push(
+        `--${(argv.activeOutputProgram as string).toLowerCase()}`
+      )
+    } else {
       const app = await prompt.list(
         'Which app?',
         promptUtils.parseList(
@@ -169,44 +193,51 @@ export const CLIFlix = {
         )
       )
 
-      webtorrentOptions = webtorrentUtils.setApp(webtorrentOptions, app)
+      webtorrentOptions.push(`--${app.toLowerCase()}`)
+    }
+
+    // SET OUTPUT-DIR
+    if (argv.outputDir) {
+      webtorrentOptions.push('--out', argv.outputDir as string)
+    } else {
+      webtorrentOptions.push('--out', getDownloadsDir(Config))
     }
 
     CLIFlix.stream(magnet, webtorrentOptions)
   },
 
-  async lucky(queryOrTorrent, webtorrentOptions: string[] = []) {
-    //TODO: Maybe add subtitles support
+  async do(argv: yargs.Arguments, webtorrentOptions: string[] = []) {
     let torrent: string | undefined
     try {
-      parseTorrent(queryOrTorrent)
-      torrent = queryOrTorrent
+      parseTorrent(argv.doArg as string)
+      torrent = argv.doArg as string
     } catch (err) {
-      const torrents = await getTorrents(queryOrTorrent, 1)
+      console.error(c.red('Error: Could not parseTorrent. Exiting'))
+      console.error(err)
+      process.exit(1)
+    }
 
-      if (!torrents.length)
-        return console.error(
-          c.red(`No torrents found for "${c.bold(queryOrTorrent)}"`)
-        )
-
-      torrent = await getMagnet(torrents[0])
-      if (!torrent) return console.error(c.red('Magnet not found.'))
+    // SET OUTPUT-DIR
+    if (argv.outputDir) {
+      webtorrentOptions.push('--out', argv.outputDir as string)
+    } else {
+      webtorrentOptions.push('--out', getDownloadsDir(Config))
     }
 
     return CLIFlix.stream(torrent, webtorrentOptions)
   },
 
-  async stream(torrent, webtorrentOptions: string[] = []) {
-    webtorrentOptions = webtorrentUtils.parse(
-      webtorrentOptions,
-      Config.webtorrent.options
-    )
+  async stream(torrent: string | undefined, webtorrentOptions: string[] = []) {
+    if (!torrent) {
+      console.error(c.red('Error: torrent param undefined. Exiting'))
+      process.exit(1)
+    }
 
-    const execArgs = ['download', torrent, ...webtorrentOptions],
-      execOpts = {
-        cwd: path.resolve(__dirname, '..'),
-        stdio: 'inherit' as 'inherit',
-      }
+    const execArgs = ['download', torrent, ...webtorrentOptions, '--no-quit']
+    const execOpts = {
+      cwd: path.resolve(__dirname, '..'),
+      stdio: 'inherit' as 'inherit',
+    }
 
     execa.sync('webtorrent', execArgs, execOpts)
   },
