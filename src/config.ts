@@ -1,21 +1,13 @@
 import path from 'path'
-import fs from 'fs'
 import os from 'os'
-import _ from 'lodash'
-import c from 'ansi-colors'
-import JSON5 from 'json5'
-import localeCode from 'locale-code'
-import osLocale from 'os-locale'
-
-import prompt from 'inquirer-helpers'
 
 function getCfg(): string {
-  let cfg: string
+  let cfg = path.join(process.env.HOME as string, '.config')
   if (process.env.XDG_CONFIG_HOME && process.env.XDG_CONFIG_HOME !== '') {
     cfg = process.env.XDG_CONFIG_HOME
   }
-  cfg = path.join(process.env.HOME as string, '.config')
-  return path.join(cfg, 'cliflix.json')
+
+  return path.join(cfg, 'cliflix', 'cliflix.json')
 }
 
 export const Config = {
@@ -176,61 +168,10 @@ export const Config = {
     },
   },
   webtorrent: {
-    options: ['--keep-seeding'],
+    options: [],
   },
   prompt: {
     fullscreen: true,
     rows: 10,
   },
 }
-
-function initPrompt() {
-  prompt.FULLSCREEN = Config.prompt.fullscreen
-  prompt.PAGE_SIZE = Config.prompt.rows
-}
-
-function initLocale() {
-  const locale = osLocale.sync().replace('_', '-')
-  const languageName = localeCode.getLanguageName(locale)
-  const language = Config.subtitles.languages.available.find((language) =>
-    language.startsWith(languageName)
-  )
-
-  if (!language) return
-
-  Config.subtitles.languages.favorites = _.uniq([
-    language,
-    ...Config.subtitles.languages.favorites,
-  ])
-}
-
-function initLocalConfig() {
-  try {
-    const content = fs
-      .readFileSync(Config.localConfigPath, { encoding: 'utf8' })
-      .toString()
-
-    if (!content || !content.trim()) return
-
-    const localConfig = _.attempt(JSON5.parse, content)
-
-    if (_.isError(localConfig)) {
-      console.error(
-        c.red(
-          `Error reading the configuration file (${c.bold(
-            Config.localConfigPath
-          )}). Is it properly formatted JSON?`
-        )
-      )
-    } else {
-      _.mergeWith(Config, localConfig, (prev, next) => {
-        if (!_.isArray(prev) || !_.isArray(next)) return
-        return next
-      })
-    }
-  } catch (e) {}
-}
-
-initLocale()
-initLocalConfig()
-initPrompt()

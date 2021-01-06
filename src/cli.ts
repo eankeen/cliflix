@@ -1,13 +1,13 @@
-import readPkg from 'read-pkg-up'
-import { utils } from './utils'
-import { CLIFlix } from './index'
 import yargs from 'yargs'
 
-export async function cli() {
-  process.on('SIGINT', () => process.exit(1))
+import { initLocale, initLocalConfig, initMisc } from './init'
+import { CLIFlix } from './index'
+import * as util from './utils'
 
-  // @ts-ignore
-  const { packageJson } = await readPkg({ cwd: __dirname })
+export async function cli() {
+  initLocale()
+  initLocalConfig()
+  initMisc()
 
   yargs
     .scriptName('cliflix')
@@ -15,34 +15,21 @@ export async function cli() {
     .command({
       command: '*',
       handler: (argv) => {
-        if (argv._[0]) {
-          console.log('Unknown commmand', argv._[0])
-          return
-        }
-        console.info(argv)
-        const webtorrentOptions = []
-        CLIFlix.wizard(webtorrentOptions)
-      },
-    })
-    .command({
-      command: 'torrent <torrent>',
-      describe: 'Use torrent',
-      handler: (argv) => {
-        console.info(argv)
-        const webtorrentOptions = []
-        // CLIFlix.lucky(queryOrTorrent, webtorrentOptions)
-      },
-    })
-    .command({
-      command: 'title <title>',
-      describe: 'Use title',
-      handler: (argv) => {
-        console.info(argv)
-        const webtorrentOptions = []
-        // CLIFlix.lucky(queryOrTorrent, webtorrentOptions)
-      },
-    })
+        util.checkConnection()
 
+        const webtorrentOptions = []
+        CLIFlix.wizard(argv, webtorrentOptions)
+      },
+    })
+    .command({
+      command: 'do <param>',
+      handler: (argv) => {
+        util.checkConnection()
+
+        const webtorrentOptions = []
+        CLIFlix.lucky(argv.param, webtorrentOptions)
+      },
+    })
     .option('activeTorrentProvider', {
       type: 'string',
       describe:
@@ -58,6 +45,10 @@ export async function cli() {
     })
     .option('subtitleFile', {
       type: 'string',
+    })
+    .option('noSubtitles', {
+      type: 'boolean',
+      default: false,
     })
     .example('$0', 'Launches cliflix wizard')
     .alias('help', 'h')
