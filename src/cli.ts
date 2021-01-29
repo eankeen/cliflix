@@ -1,11 +1,10 @@
 import yargs from 'yargs'
 
-import { initLocale, initLocalConfig, initMisc } from './init'
+import { initLocalConfig, initMisc } from './init'
 import { CLIFlix } from './index'
 import * as util from './utils'
 
 export async function cli() {
-  initLocale()
   initLocalConfig()
   initMisc()
 

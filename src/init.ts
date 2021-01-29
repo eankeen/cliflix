@@ -2,26 +2,9 @@ import fs from 'fs'
 import _ from 'lodash'
 import c from 'ansi-colors'
 import JSON5 from 'json5'
-import localeCode from 'locale-code'
 import temp from 'temp'
-import osLocale from 'os-locale'
 
 import { Config } from './config'
-
-export function initLocale() {
-  const locale = osLocale.sync().replace('_', '-')
-  const languageName = localeCode.getLanguageName(locale)
-  const language = Config.subtitles.languages.available.find((language) =>
-    language.startsWith(languageName)
-  )
-
-  if (!language) return
-
-  Config.subtitles.languages.favorites = _.uniq([
-    language,
-    ...Config.subtitles.languages.favorites,
-  ])
-}
 
 export function initLocalConfig() {
   try {
