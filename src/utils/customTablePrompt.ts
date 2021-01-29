@@ -1,6 +1,8 @@
 import truncate from 'cli-truncate'
 import windowSize from 'window-size'
 import c from 'ansi-colors'
+import prompts from 'prompts'
+
 import {
   sum,
   max,
@@ -8,9 +10,7 @@ import {
   padEnd,
   isPlainObject,
   isString,
-  isUndefined,
 } from 'lodash'
-import inquirer from 'inquirer'
 
 function _cliWidth() {
   let CLI_WIDTH = 80
@@ -45,21 +45,22 @@ async function IHList(message: string, list: any[], fallback?) {
 
   /* END OF LIST */
   const pageSize = _cliPageSize()
-  if (list.length > pageSize) list.push(new inquirer.Separator('\n'))
+  if (list.length > pageSize) list.push('\n')
 
   /* LIST */
+  const result = (
+    await prompts({
+      type: 'autocomplete',
+      name: 'input',
+      message: message,
+      choices: list.map(item => ({
+        title: item.name,
+        value: item
+      }))
+    })
+  )?.input
 
-  const { result } = await inquirer.prompt({
-    type: 'list',
-    name: 'result',
-    choices: list,
-    pageSize,
-    message,
-    default: fallback,
-    validate: (x) => !isUndefined(fallback) || (isString(x) && x.trim()),
-  })
-
-  return result
+  return result.value
 }
 
 export async function customTablePrompt(

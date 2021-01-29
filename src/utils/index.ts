@@ -11,7 +11,3 @@ export async function checkConnection() {
 export function getDownloadsDir(Config: Record<string, any>) {
   return Config.downloadPath
 }
-
-export function isOptionSet(options: string[], regex) {
-  return !!options.find((option) => !!option.match(regex))
-}

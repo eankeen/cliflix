@@ -15,7 +15,6 @@ export function initLocalConfig() {
     if (!content || !content.trim()) return
 
     const localConfig = _.attempt(JSON5.parse, content)
-
     if (_.isError(localConfig)) {
       console.error(
         c.red(

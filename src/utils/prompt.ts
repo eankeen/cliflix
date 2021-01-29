@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import inquirer from 'inquirer'
 
 import { Config } from '../config'
 import { customTablePrompt } from './customTablePrompt'
@@ -14,15 +13,6 @@ function parseTitleTitle(title: any) {
     .replace(/\s\s+/g, ' ') // Multiple spaces
     .replace(/- -/g, '-') // Empty blocks between dashes
     .replace(/\s*-$/, '') // Ending dash
-}
-
-export function parseList(list: string[], favorites: string[] = []) {
-  list = _.difference(list, favorites)
-
-  if (!list.length) return favorites
-  if (!favorites.length) return list
-
-  return [...favorites, new inquirer.Separator(), ...list] //FIXME: Proper separator width
 }
 
 export async function title(message: string, titles: any[]) {

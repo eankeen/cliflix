@@ -131,7 +131,7 @@ export const CLIFlix = {
     // GET TORRENT
     const torrent = await getTorrent(argv)
 
-    // GET MAGENET
+    // GET MAGENETF
     const magnet = await getMagnet(torrent)
     if (!torrent) return console.error(c.red('Magnet not found.'))
 
@@ -221,7 +221,7 @@ export const CLIFlix = {
         await prompts({
           type: 'autocomplete',
           name: 'input',
-          message: 'Which app??',
+          message: 'Which app?',
           choices: apps,
         })
       )?.input
