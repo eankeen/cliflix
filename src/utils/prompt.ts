@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import inquirer from 'inquirer'
-import prompt from 'inquirer-helpers'
 
 import { Config } from '../config'
+import { customTablePrompt } from './customTablePrompt'
 
 function parseSubtitleTitle(title: any) {
   return title.replace(/\.srt$/i, '') // Extension
@@ -56,7 +56,7 @@ export async function title(message: string, titles: any[]) {
   if (Config.torrents.details.size && hasSize) colors.push('yellow')
   if (Config.torrents.details.time && hasTime) colors.push('magenta')
 
-  return await prompt.table(message, table, titles, colors)
+  return await customTablePrompt(message, table, titles, colors)
 }
 
 export async function subtitles(message: string, subtitlesAll: any) {
@@ -74,5 +74,5 @@ export async function subtitles(message: string, subtitlesAll: any) {
 
   /* COLORS */
   const colors = [undefined, 'green']
-  return await prompt.table(message, table, subtitlesAll, colors)
+  return await customTablePrompt(message, table, subtitlesAll, colors)
 }

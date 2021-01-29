@@ -8,7 +8,6 @@ import OpenSubtitles from 'opensubtitles-api'
 import parseTorrent from 'parse-torrent'
 import prompts from 'prompts'
 import torrentSearch from 'torrent-search-api'
-import prompt from 'inquirer-helpers'
 import fs from 'fs'
 import temp from 'temp'
 import fetch from 'node-fetch'
@@ -30,9 +29,15 @@ async function getMagnet(torrent: any): Promise<string> {
 
 async function getTorrent(argv: yargs.Arguments) {
   while (true) {
-    const query = argv.title
-      ? argv.title
-      : await prompt.input('What do you want to watch?')
+    const query = (
+      await prompts({
+        type: 'text',
+        name: 'input',
+        validate: (input) => (input === '' ? 'Input cannot be empty' : true),
+        message: 'What do you want to watch?',
+      })
+    )?.input
+
     const provider = argv.activeTorrentProvider
       ? (argv.activeTorrentProvider as string)
       : Config.torrents.providers.active
@@ -67,14 +72,23 @@ async function getSubtitles(query: string, language: string) {
 
 async function getTorrents(
   query: any,
-  rows = Config.torrents.limit,
-  provider = Config.torrents.providers.active,
-  providers = Config.torrents.providers.available
+  rows: number = Config.torrents.limit,
+  provider: string = Config.torrents.providers.active,
+  providers: string[] = Config.torrents.providers.available
 ) {
   const hasProvider = !!provider
-
-  if (!provider) {
-    provider = await prompt.list('Which torrents provider?', providers)
+  if (!hasProvider) {
+    provider = (
+      await prompts({
+        type: 'select',
+        name: 'input',
+        message: 'Which torrents provider?',
+        choices: providers.map((provider) => ({
+          title: provider.trim(),
+          value: provider,
+        })),
+      })
+    )?.input
   }
 
   const categories = {
@@ -123,22 +137,33 @@ export const CLIFlix = {
 
     // SET SUBTITLES
     if (argv.subtitles) {
-      const languageName =
-        Config.activeLanguage && Config.activeLanguage.length > 1
-          ? Config.activeLanguage
-          : await prompt.list(
-              'Which language?',
-              promptUtils.parseList(
-                Config.subtitles.languages.available,
-                Config.subtitles.languages.favorites
-              )
-            )
+      let languageName = Config.activeLanguage
+      if (languageName == '') {
+        const languages = Array.prototype.concat
+          .call(
+            Config.subtitles.languages.favorites,
+            Config.subtitles.languages.available
+          )
+          .map((language: string) => ({
+            title: language,
+            value: language,
+          }))
+
+        languageName = (
+          await prompts({
+            type: 'autocomplete',
+            name: 'input',
+            message: 'Which language?',
+            choices: languages,
+          })
+        )?.input
+      }
+
       const languageCode = lang.getCode(languageName)
       const spinner = ora(`Waiting for "${c.bold('OpenSubtitles')}"...`).start()
       const subtitlesAll = await getSubtitles(torrent.title, languageCode)
 
       spinner.stop()
-
       if (!subtitlesAll.length && !argv.autosubtitles) {
         const res = await prompts({
           type: 'confirm',
@@ -185,13 +210,21 @@ export const CLIFlix = {
         `--${(argv.activeOutputProgram as string).toLowerCase()}`
       )
     } else {
-      const app = await prompt.list(
-        'Which app?',
-        promptUtils.parseList(
-          Config.outputs.available,
-          Config.outputs.favorites
-        )
-      )
+      const apps = Array.prototype.concat
+        .call(Config.outputs.favorites, Config.outputs.available)
+        .map((app: string) => ({
+          title: app,
+          value: app,
+        }))
+
+      const app = (
+        await prompts({
+          type: 'autocomplete',
+          name: 'input',
+          message: 'Which app??',
+          choices: apps,
+        })
+      )?.input
 
       webtorrentOptions.push(`--${app.toLowerCase()}`)
     }

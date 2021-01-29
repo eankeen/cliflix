@@ -1,7 +1,6 @@
 import fs from 'fs'
 import _ from 'lodash'
 import c from 'ansi-colors'
-import prompt from 'inquirer-helpers'
 import JSON5 from 'json5'
 import localeCode from 'locale-code'
 import temp from 'temp'
@@ -54,10 +53,6 @@ export function initLocalConfig() {
 }
 
 export function initMisc() {
-  // prompt
-  prompt.FULLSCREEN = Config.prompt.fullscreen
-  prompt.PAGE_SIZE = Config.prompt.rows
-
   // temp / signal handlers
   process.on('SIGINT', () => process.exit(1))
   temp.track()
