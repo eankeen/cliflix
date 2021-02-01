@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 const language = {
   codes: [
     'afr',
@@ -162,8 +160,9 @@ const language = {
   ],
 }
 
-export function getCode(name) {
-  const { codes, names } = language
+export function getLangCode(langPretty: string) {
+  const { names: langPrettyArray, codes: langCodesArray } = language
 
-  return codes[_.indexOf(names, name)]
+  const langCode = langCodesArray[langPrettyArray.indexOf(langPretty)]
+  return langCode
 }

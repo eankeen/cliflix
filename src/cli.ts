@@ -1,62 +1,62 @@
 import yargs from 'yargs'
 
-import { initLocalConfig, initMisc } from './init'
-import { CLIFlix } from './index'
+import { init } from './utils'
+import * as actions from './actions'
 import * as util from './utils'
 
 export async function cli() {
-  initLocalConfig()
-  initMisc()
+  init()
 
   yargs
     .scriptName('cliflix')
     .usage('$0 <cmd> [args]')
     .command({
       command: '*',
-      handler: (argv) => {
+      handler: async (argv) => {
         util.checkConnection()
 
-        const webtorrentOptions = []
-        CLIFlix.wizard(argv, webtorrentOptions)
+        await actions.doWizard(argv)
       },
     })
     .command({
       command: 'do <doArg>',
-      handler: (argv) => {
+      handler: async (argv) => {
         util.checkConnection()
 
-        const webtorrentOptions = []
-        CLIFlix.do(argv, webtorrentOptions)
+        await actions.doInfer(argv)
       },
     })
-    .option('activeTorrentProvider', {
+    // new options
+    .option('torrentProvider', {
       type: 'string',
       describe:
         'Torrent providers: 1337x|ThePirateBay|ExtraTorrent|Rarbg|Torrent9|KickassTorrents|TorrentProject|Torrentz2',
     })
-    .option('activeOutputProgram', {
+    .option('moviePlayer', {
       type: 'string',
       describe:
         'App to play the movie with: VLC|Airplay|Chromecase|DLNA|MPlayer|mpv|IINA|XBMC',
     })
-    .option('title', {
-      type: 'string',
-      describe: 'Name of movie / media you want to watch',
-    })
-    .option('outputDir', {
-      type: 'string',
-      describe: 'Directory to output files. Same as "downloads.path"',
-    })
-    .option('subtitles', {
+    .option('skipNoSubtitles', {
       type: 'boolean',
-      describe: 'Download and use subtitles',
-      default: true,
+      describe: 'Download and use subtitlese',
+      // TODO: yargs overriding actual 'defualt' config in config file, but still want to show what is default
+      // default: false,
     })
-    .option('autosubtitles', {
-      type: 'boolean',
-      describe:
-        'Automatically pick the most downloaded subtitles. Also skips the "No subtitles, continue?" menu branch',
-      default: false,
+    .option('torrentListLength', {
+      type: 'number',
+      describe: 'The number of torrents suggested after a search',
+      // default: 30,
+    })
+    .option('downloadDir', {
+      type: 'string',
+      describe: 'Location to download the movie to',
+      // default: path.join(os.homedir(), 'Downloads')
+    })
+    .option('configFile', {
+      type: 'string',
+      describe: 'Location to download the movie to',
+      // default: getCfgFile()
     })
     .example('$0', 'Launches cliflix wizard')
     .alias('help', 'h')

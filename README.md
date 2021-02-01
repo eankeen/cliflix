@@ -150,3 +150,7 @@ You can customize `cliflix` to your likings via a `"${XDG_CONFIG_HOME:-$HOME/.co
 - Make configuration more unified (better naming schema), better `subtitle` options and similar names to command line options
 - Use a different prompt library
 - Actually have ability to pass command line options directly to WebTorrent
+
+todo:
+clean up error console logs
+log errors to console during debug / dev mode

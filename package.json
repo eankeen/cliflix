@@ -9,7 +9,8 @@
     "clean": "rm -rf dist",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "prepublishOnly": "npm run clean && npm run build"
+    "prepublishOnly": "npm run clean && npm run build",
+    "start": "node dist/bin/index.js"
   },
   "bugs": {
     "url": "https://github.com/eankeen/cliflix/issues"
