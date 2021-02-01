@@ -1,7 +1,4 @@
 import type yargs from 'yargs'
-import c from 'ansi-colors'
-import parseTorrent from 'parse-torrent'
-
 import * as util from '../utils'
 import { defaultConfig } from '../config'
 import { streamMovie } from './stream'

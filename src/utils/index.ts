@@ -1,22 +1,22 @@
-import isOnline from 'is-online'
 import c from 'ansi-colors'
 import temp from 'temp'
 import type yargs from 'yargs'
+import fetch from 'node-fetch'
 
 import prompts, { PromptType } from 'prompts'
 import { defaultConfig } from '../config'
 
 export * from './gets'
 
-export async function checkConnection() {
-  const online = await isOnline()
-
-  if (!online)
-    throw new Error(c.red('Looks like you are offline, try again later.\n'))
-}
-
-export function getDownloadsDir(Config: Record<string, any>) {
-  return Config.downloadPath
+export async function ensureConnection() {
+  try {
+    await fetch('https://google.com', {
+      method: 'HEAD',
+    })
+  } catch (err) {
+    console.error(c.red('Looks like you are offline. Exiting'))
+    process.exit(1)
+  }
 }
 
 /**

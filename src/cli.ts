@@ -13,7 +13,7 @@ export async function cli() {
     .command({
       command: '*',
       handler: async (argv) => {
-        util.checkConnection()
+        util.ensureConnection()
 
         await actions.doWizard(argv)
       },
@@ -21,7 +21,7 @@ export async function cli() {
     .command({
       command: 'do <doArg>',
       handler: async (argv) => {
-        util.checkConnection()
+        util.ensureConnection()
 
         await actions.doInfer(argv)
       },
