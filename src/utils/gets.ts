@@ -71,6 +71,30 @@ export async function getTorrents(
   }
 }
 
+export async function getTorrentChoice(
+  torrents: torrentSearch.Torrent[]
+): Promise<torrentSearch.Torrent> {
+  const input = await prompts({
+    type: 'select',
+    name: 'value',
+    validate: (input: string) =>
+      input.trim() === '' ? 'Input cannot be empty' : true,
+    message: 'Which torrent do you want to use?',
+    choices: torrents.map((torrent) => ({
+      // @ts-ignore
+      title: `${torrent.seeds} | ${torrent.peers} | ${torrent.title} | ${torrent.size} | ${torrent.time}`,
+      value: torrent,
+    })),
+  })
+
+  if (Object.keys(input).length === 0) {
+    console.info(c.yellow('Input empty. Exiting'))
+    process.exit(1)
+  }
+
+  return input.value
+}
+
 export async function getMagnets(torrent: torrentSearch.Torrent) {
   try {
     return torrentSearch.getMagnet(torrent)

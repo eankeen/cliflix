@@ -45,3 +45,4 @@ Alternatively, add them to the config located at `"${XDG_CONFIG_HOME:-$HOME/.con
 - print errors in debug / dev mode
 - Bug: sigint during webtorrent stream prints messy error
 - choose which torrent to get in doWizard mode
+- share code to validate output after any 'prompt' selection (empty object)

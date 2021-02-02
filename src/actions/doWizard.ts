@@ -13,8 +13,7 @@ export async function doWizard(argv: yargs.Arguments): Promise<void> {
   await util.ensureProperty(cfg, 'subtitleLanguage', 'autocomplete')
 
   const torrents = await util.getTorrents(cfg)
-  // const torrent = await utils.chooseTorrent(torrents)
-  const torrent = torrents[0]
+  const torrent = await util.getTorrentChoice(torrents)
   const magnet = await util.getMagnets(torrent)
   const subtitles = await util.getSubtitles(cfg, torrent)
   const subtitleFile = await util.getSubtitleFile(cfg, subtitles[0])
