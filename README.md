@@ -18,10 +18,6 @@ $ npm install -g @eankeen/cliflix
 
 Execute `cliflix` to run a wizard, and prompt for movie, torrent, subtitles, and app you wish to open
 
-<p align="center">
-  <img src="resources/wizard.gif" width="630" alt="Wizard Gif">
-</p>
-
 To skip past repetitive prompts, add options:
 
 ```sh

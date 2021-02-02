@@ -5,6 +5,7 @@ import c from 'ansi-colors'
 import temp from 'temp'
 import fetch from 'node-fetch'
 import type yargs from 'yargs'
+import onExit from 'signal-exit'
 
 import prompts, { PromptType } from 'prompts'
 import { defaultConfig } from '../config'
@@ -56,6 +57,12 @@ export async function ensureProperty(
         value: property,
       })),
     })
+
+    if (Object.keys(input).length === 0) {
+      console.info(c.yellow('Input empty. Exiting'))
+      process.exit(1)
+    }
+
     cfg[property] = input.value
   }
 }
@@ -69,6 +76,11 @@ export function init() {
   })
 
   process.on('SIGINT', (sig) => {
+    temp.cleanupSync()
+    process.exit(1)
+  })
+
+  onExit((code, signal) => {
     temp.cleanupSync()
     process.exit(1)
   })
