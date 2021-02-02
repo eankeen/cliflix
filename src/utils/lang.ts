@@ -1,3 +1,5 @@
+import c from 'ansi-colors'
+
 const language = {
   codes: [
     'afr',
@@ -161,6 +163,11 @@ const language = {
 }
 
 export function getLangCode(langPretty: string) {
+  if (!langPretty) {
+    console.warn(c.yellow('Warning: langPretty falsy. Returning English'))
+    return 'eng'
+  }
+
   const { names: langPrettyArray, codes: langCodesArray } = language
 
   const langCode = langCodesArray[langPrettyArray.indexOf(langPretty)]

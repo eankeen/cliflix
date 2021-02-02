@@ -1,4 +1,6 @@
+import path from 'path'
 import type yargs from 'yargs'
+
 import * as util from '../utils'
 import { defaultConfig } from '../config'
 import { streamMovie } from './stream'
@@ -15,13 +17,14 @@ export async function doInfer(argv: yargs.Arguments): Promise<void> {
   const magnet = await util.getMagnets(torrent)
   const subtitles = await util.getSubtitles(cfg, torrent)
   const subtitleFile = await util.getSubtitleFile(cfg, subtitles[0])
+  console.info(subtitleFile)
 
   streamMovie(magnet, [
     '--out',
-    cfg.downloadDir,
+    path.dirname(subtitleFile),
     '--subtitles',
     subtitleFile,
-    '--vlc',
-    '--no-quit',
+    `--${cfg.moviePlayer.toLowerCase()}`,
+    ...cfg.webtorrentOptions,
   ])
 }

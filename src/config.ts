@@ -10,7 +10,7 @@ function getCfgFile(): string {
   return path.join(cfg, 'cliflix', 'cliflix.json')
 }
 
-export const defaultConfig = {
+const defaultConfig = {
   torrentProvider: '',
   torrentProviders: [
     '1337x',
@@ -33,16 +33,18 @@ export const defaultConfig = {
     'IINA',
     'XBMC',
   ],
-  title: '',
-  subtitleLanguage: 'English',
+  subtitleLanguage: '',
   subtitleLanguages: ['English', 'Spanish', 'German'],
+  title: '',
+  saveMedia: false,
   skipNoSubtitles: false,
   torrentListLength: 30,
   downloadDir: path.join(os.homedir(), 'Downloads'),
   configFile: getCfgFile(),
+  webtorrentOptions: [],
 }
 
-defaultConfig.subtitleLanguages.concat([
+defaultConfig.subtitleLanguages = defaultConfig.subtitleLanguages.concat([
   'Afrikaans',
   'Albanian',
   'Arabic',
@@ -121,3 +123,4 @@ defaultConfig.subtitleLanguages.concat([
   'Urdu',
   'Vietnamese',
 ])
+export { defaultConfig }

@@ -26,7 +26,6 @@ export async function cli() {
         await actions.doInfer(argv)
       },
     })
-    // new options
     .option('torrentProvider', {
       type: 'string',
       describe:
@@ -37,30 +36,34 @@ export async function cli() {
       describe:
         'App to play the movie with: VLC|Airplay|Chromecase|DLNA|MPlayer|mpv|IINA|XBMC',
     })
+    .option('subtitleLanguage', {
+      type: 'string',
+      describe: 'Language for subtitles',
+    })
     .option('title', {
       type: 'string',
       describe: 'Name of the movie, TV show, or series',
     })
+    .option('saveMedia', {
+      type: 'boolean',
+      describe:
+        'Whether to save the movie to disk or save it in memory temporarily',
+    })
     .option('skipNoSubtitles', {
       type: 'boolean',
       describe: 'Download and use subtitlese',
-      // TODO: yargs overriding actual 'defualt' config in config file, but still want to show what is default
-      // default: false,
     })
     .option('torrentListLength', {
       type: 'number',
       describe: 'The number of torrents suggested after a search',
-      // default: 30,
     })
     .option('downloadDir', {
       type: 'string',
       describe: 'Location to download the movie to',
-      // default: path.join(os.homedir(), 'Downloads')
     })
     .option('configFile', {
       type: 'string',
       describe: 'Location to download the movie to',
-      // default: getCfgFile()
     })
     .example('$0', 'Launches cliflix wizard')
     .alias('help', 'h')

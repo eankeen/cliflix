@@ -9,6 +9,7 @@ import fetch from 'node-fetch'
 
 import { defaultConfig } from '../config'
 import { getLangCode } from './lang'
+import { resolveHome } from '.'
 
 export async function getTorrents(
   cfg: typeof defaultConfig,
@@ -100,16 +101,7 @@ export async function getSubtitles(
   cfg: typeof defaultConfig,
   torrent: torrentSearch.Torrent
 ): Promise<subtitle[]> {
-  const input = await prompts({
-    type: 'autocomplete',
-    name: 'value',
-    message: 'Which language?',
-    choices: defaultConfig.subtitleLanguages.map((language: string) => ({
-      title: language,
-      value: language,
-    })),
-  })
-  const languageCode = getLangCode(input.value)
+  const languageCode = getLangCode(cfg.subtitleLanguage)
   try {
     const OS = new OpenSubtitles({
       useragent: 'PlayMe v1',
@@ -120,13 +112,12 @@ export async function getSubtitles(
 
     const results = await OS.search({
       sublanguageid: languageCode,
-      limit: 30,
+      limit: 10,
       query: torrent.title,
     })
     return results[Object.keys(results)[0]] || []
   } catch (err) {
     console.error(c.red('OpenSubtitles error. Ignoring'))
-    console.error(err)
     return []
   }
 }
@@ -139,8 +130,10 @@ export async function getSubtitleFile(
     let stream: fs.WriteStream
 
     const content = await (await fetch(subtitle.url)).text()
-    stream = false
-      ? fs.createWriteStream(path.join(cfg.downloadDir, subtitle.filename))
+    stream = cfg.saveMedia
+      ? fs.createWriteStream(
+          path.join(resolveHome(cfg.downloadDir), subtitle.filename)
+        )
       : temp.createWriteStream()
 
     stream.write(content)

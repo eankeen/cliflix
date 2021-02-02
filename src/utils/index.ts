@@ -1,7 +1,10 @@
+import path from 'path'
+import os from 'os'
+
 import c from 'ansi-colors'
 import temp from 'temp'
-import type yargs from 'yargs'
 import fetch from 'node-fetch'
+import type yargs from 'yargs'
 
 import prompts, { PromptType } from 'prompts'
 import { defaultConfig } from '../config'
@@ -25,7 +28,6 @@ export function mergeConfig(
   argv: yargs.Arguments,
   defaultCfg: typeof defaultConfig
 ): typeof defaultConfig {
-  console.info(argv)
   return Object.assign({}, defaultCfg, argv)
 }
 
@@ -78,4 +80,11 @@ export function init() {
   process.on('unhandledRejection', (err) => {
     console.error(err)
   })
+}
+
+export function resolveHome(filepath: string): string {
+  if (filepath[0] + filepath[1] === '~/') {
+    return path.join(os.homedir(), filepath.slice(1))
+  }
+  return filepath
 }
