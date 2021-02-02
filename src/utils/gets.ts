@@ -16,6 +16,7 @@ export async function getTorrents(
   torrentProvider: string | null = null,
   torrentProviders: string[] | null = null
 ): Promise<torrentSearch.Torrent[]> {
+  if (!query && cfg.title) query = cfg.title
   if (!torrentProvider) torrentProvider = cfg.torrentProvider
   if (!torrentProviders) torrentProviders = cfg.torrentProviders
 

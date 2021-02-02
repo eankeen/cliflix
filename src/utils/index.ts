@@ -25,6 +25,7 @@ export function mergeConfig(
   argv: yargs.Arguments,
   defaultCfg: typeof defaultConfig
 ): typeof defaultConfig {
+  console.info(argv)
   return Object.assign({}, defaultCfg, argv)
 }
 

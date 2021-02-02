@@ -1,10 +1,8 @@
 # cliflix
 
-Watch anything instantaneously, just write its name
+Watch any media instantaneously.
 
-It searches a torrent for you and streams it using [WebTorrent](https://github.com/fabiospampinato/webtorrent-cli/tree/iina-pip) to your favorite app. It supports subtitles too
-
-The Code based from Fabio Spampinato's [CLIFlix](https://github.com/fabiospampinato/cliflix). Compared to the original, the code is structured differently, removes (direct) dependencies on old menu/fetching/etc. libraries and removes excess functionality. And rather than checking for WebTorrent arguments and overriding, most behavioral arguments are configured within this app's interface
+Cliflix searches for torrent and streams the resulting magent using [WebTorrent](https://github.com/fabiospampinato/webtorrent-cli/tree/iina-pip) to your favorite app. Inspired from Fabio Spampinato's [CLIFlix](https://github.com/fabiospampinato/cliflix)
 
 > **Warning**: If you don't know what a torrent is, or are unsure about the legality of the torrents you're downloading you shouldn't use `cliflix`.
 
@@ -21,42 +19,8 @@ $ npm install -g @eankeen/cliflix
 Execute `cliflix` to run a wizard, and prompt for movie, torrent, subtitles, and app you wish to open
 
 <p align="center">
-  <img src="resources/wizard.gif" width="631" alt="Wizard Gif">
+  <img src="resources/wizard.gif" width="630" alt="Wizard Gif">
 </p>
-
-### Wizard Bypass
-
-You can bypass certain parts of wizard if you know what you want
-
-- `--title`
-
-  - title of movie
-  - ex. `--title=Zootopia`
-
-- `--activeOutputProgram`
-
-  - bypasses output program
-  - ex. `--activeOutputProgram=vlc`
-
-- `--subtitles`
-
-  - Automatically enable subtitle searching
-  - ex. `--subtitles=true`
-
-- `--autosubtitles`
-
-  - Automaticaly pick the most downloaded subtitles
-  - ex. `--autosubtitles=true`
-
-### Other Options
-
-- `--activeTorrentProvider`
-
-  - Override `Config.torrents.providers.active` on the fly
-
-- `--outputDir`
-
-  - Override `downloadPath` on the fly
 
 ### Recommenations
 
@@ -72,23 +36,6 @@ alias cliflix='cliflix --activeOutputProgram=vlc --subtitles=true --autosubtitle
   "activeLanguage": "English",
   "downloadSave": true
 }
-```
-
-### Advanced
-
-You can also directly pass any of the valid torrent identifiers supported by [parse-torrent](https://github.com/webtorrent/parse-torrent) to stream it:
-
-```sh
-cliflix do "magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2F&xs=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel.torrent"
-```
-
-You cannot pass arbitrary options to [WebTorrent](https://github.com/fabiospampinato/webtorrent-cli/tree/iina-pip), read more about them [here](https://github.com/fabiospampinato/webtorrent-cli/tree/iina-pip). Note that if you do this, it may interfere with some `cliflix` options (`ex. activeOutputProgram`)
-
-```sh
-# does not work
-
-cliflix -- --iina --pip
-cliflix -- --vlc --port 1234
 ```
 
 ## Configuration

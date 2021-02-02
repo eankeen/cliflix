@@ -33,6 +33,7 @@ export const defaultConfig = {
     'IINA',
     'XBMC',
   ],
+  title: '',
   subtitleLanguage: 'English',
   subtitleLanguages: ['English', 'Spanish', 'German'],
   skipNoSubtitles: false,

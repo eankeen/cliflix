@@ -37,6 +37,10 @@ export async function cli() {
       describe:
         'App to play the movie with: VLC|Airplay|Chromecase|DLNA|MPlayer|mpv|IINA|XBMC',
     })
+    .option('title', {
+      type: 'string',
+      describe: 'Name of the movie, TV show, or series',
+    })
     .option('skipNoSubtitles', {
       type: 'boolean',
       describe: 'Download and use subtitlese',
