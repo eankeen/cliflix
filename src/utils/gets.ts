@@ -1,12 +1,14 @@
 import fs from 'fs'
 import path from 'path'
+import os from 'os'
+
 import c from 'ansi-colors'
-import temp from 'temp'
 import OpenSubtitles from 'opensubtitles-api'
 import JSON5 from 'json5'
 import prompts from 'prompts'
 import torrentSearch from 'torrent-search-api'
 import fetch from 'node-fetch'
+import { v4 as uuid } from 'uuid'
 
 import { defaultConfig } from '../config'
 import { getLangCode } from './lang'
@@ -173,18 +175,34 @@ export async function getSubtitleFile(
     let stream: fs.WriteStream
 
     const content = await (await fetch(subtitle.url)).text()
-    stream = cfg.saveMedia
-      ? fs.createWriteStream(
-          path.join(resolveHome(cfg.downloadDir), subtitle.filename)
-        )
-      : temp.createWriteStream()
+    if (cfg.saveMedia) {
+      stream = fs.createWriteStream(
+        path.join(resolveHome(cfg.downloadDir), subtitle.filename)
+      )
+    } else {
+      let id = uuid()
+      id = id.slice(0, id.indexOf('-'))
+      const tempFile = path.join(
+        os.tmpdir(),
+        `cliflix-${cfg.title}-${id}`,
+        subtitle.filename
+      )
+      await fs.promises.mkdir(path.dirname(tempFile), {
+        mode: 0o755,
+        recursive: true,
+      })
+
+      stream = fs.createWriteStream(tempFile)
+    }
 
     stream.write(content)
     stream.end()
     stream.on('finish', () => {
+      /** @global */
+      globalThis.ourTempDir = path.dirname(stream.path.toString())
       resolve(stream.path.toString())
     })
-    stream.on('error', (err) => {
+    stream.on('error', (_err) => {
       console.info(
         c.yellow('Warning: Could not download subtitles file. Ignoring')
       )

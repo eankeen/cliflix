@@ -2,13 +2,13 @@ import path from 'path'
 import os from 'os'
 
 import c from 'ansi-colors'
-import temp from 'temp'
 import fetch from 'node-fetch'
 import type yargs from 'yargs'
-import onExit from 'signal-exit'
+import rimraf from 'rimraf'
 
 import prompts, { PromptType } from 'prompts'
 import { defaultConfig } from '../config'
+import { promisify } from 'util'
 
 export * from './gets'
 
@@ -75,23 +75,26 @@ export function resolveHome(filepath: string): string {
   return filepath
 }
 
+export async function cleanupTemp(
+  subtitleFile: string | null = null
+): Promise<void> {
+  /** @global */
+  const ourTempDir =
+    (subtitleFile && path.dirname(subtitleFile)) || globalThis.ourTempDir
+  await promisify(rimraf)(ourTempDir, {
+    disableGlob: true,
+  })
+}
+
 export function init() {
-  temp.track()
+  const signals: NodeJS.Signals[] = ['SIGINT', 'SIGHUP']
+  for (const signal of signals) {
+    process.on(signal, async (_sig) => {
+      await cleanupTemp()
 
-  process.on('SIGTERM', (_sig) => {
-    temp.cleanupSync()
-    process.exit(1)
-  })
-
-  process.on('SIGINT', (_sig) => {
-    temp.cleanupSync()
-    process.exit(1)
-  })
-
-  onExit((_code, _signal) => {
-    temp.cleanupSync()
-    process.exit(1)
-  })
+      process.exit(1)
+    })
+  }
 
   process.on('uncaughtException', (err) => {
     console.error(err)

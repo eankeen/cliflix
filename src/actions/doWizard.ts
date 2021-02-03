@@ -22,7 +22,7 @@ export async function doWizard(argv: yargs.Arguments): Promise<void> {
   const subtitles = await util.getSubtitles(cfg, torrent)
   const subtitleFile = await util.getSubtitleFile(cfg, subtitles[0])
 
-  streamMovie(magnet, [
+  await streamMovie(magnet, [
     '--out',
     path.dirname(subtitleFile),
     '--subtitles',
@@ -30,4 +30,5 @@ export async function doWizard(argv: yargs.Arguments): Promise<void> {
     `--${cfg.moviePlayer.toLowerCase()}`,
     ...cfg.webtorrentOptions,
   ])
+  await util.cleanupTemp(subtitleFile)
 }

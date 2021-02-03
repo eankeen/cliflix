@@ -21,9 +21,8 @@ export async function doInfer(argv: yargs.Arguments): Promise<void> {
   const magnet = await util.getMagnets(torrent)
   const subtitles = await util.getSubtitles(cfg, torrent)
   const subtitleFile = await util.getSubtitleFile(cfg, subtitles[0])
-  console.info(subtitleFile)
 
-  streamMovie(magnet, [
+  await streamMovie(magnet, [
     '--out',
     path.dirname(subtitleFile),
     '--subtitles',
@@ -31,4 +30,5 @@ export async function doInfer(argv: yargs.Arguments): Promise<void> {
     `--${cfg.moviePlayer.toLowerCase()}`,
     ...cfg.webtorrentOptions,
   ])
+  await util.cleanupTemp(subtitleFile)
 }
