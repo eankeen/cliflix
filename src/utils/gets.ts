@@ -12,7 +12,7 @@ import { v4 as uuid } from 'uuid'
 
 import { defaultConfig } from '../config'
 import { getLangCode } from './lang'
-import { resolveHome } from '.'
+import { resolveHome, isDebug } from '.'
 
 /**
  * @summary Gets JSON Config
@@ -25,6 +25,8 @@ export async function getJsonConfig(
     return JSON5.parse(raw)
   } catch (err) {
     console.info(c.red('Error: Could not read and parse config file. Exiting'))
+    if (isDebug()) console.error(err)
+
     process.exit(1)
   }
 }
@@ -51,13 +53,13 @@ export async function getTorrents(
   }
 
   if (!query) {
-    console.info(c.yellow('Input blank. Exiting'))
+    console.error(c.red('Error: Input blank. Exiting'))
     process.exit(1)
   }
 
   if (torrentProviders.length === 0) {
-    console.info(c.yellow('Ran out of providers. Exiting'))
-    process.exit(1)
+    console.info(c.blue('Info: Ran out of providers. Exiting'))
+    process.exit(0)
   }
 
   try {
@@ -78,6 +80,7 @@ export async function getTorrents(
     console.error(
       c.yellow(`Warning: No torrents found via "${c.bold(torrentProvider)}"`)
     )
+    if (isDebug()) console.error(err)
 
     const nextTorrentProvider =
       torrentProviders[torrentProviders.indexOf(torrentProvider) + 1]
@@ -118,6 +121,8 @@ export async function getMagnets(torrent: torrentSearch.Torrent) {
     return torrentSearch.getMagnet(torrent)
   } catch (err) {
     console.error(c.red('Error: Could not get magnet. Exiting'))
+    if (isDebug()) console.error(err)
+
     process.exit(1)
   }
 }
@@ -202,10 +207,11 @@ export async function getSubtitleFile(
       globalThis.ourTempDir = path.dirname(stream.path.toString())
       resolve(stream.path.toString())
     })
-    stream.on('error', (_err) => {
+    stream.on('error', (err) => {
       console.info(
         c.yellow('Warning: Could not download subtitles file. Ignoring')
       )
+      if (isDebug()) console.error(err)
     })
   })
 }

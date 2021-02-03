@@ -19,11 +19,14 @@ export async function ensureConnection() {
     })
   } catch (err) {
     console.error(c.blue('You are offline. Please try again later'))
+    if (isDebug()) console.error(err)
+
     process.exit(0)
   }
 }
 
 /**
+ * @description Merges configuration from all sources
  */
 export function mergeConfig(
   argv: yargs.Arguments,
@@ -34,8 +37,8 @@ export function mergeConfig(
 }
 
 /**
-  Assumes that property + 's' exists on object
-*/
+ * @description Ensure a property exists and is valid on the configuration object. Assumes that property + 's' exists on object
+ */
 export async function ensureProperty(
   cfg: typeof defaultConfig,
   property: string,
@@ -78,12 +81,19 @@ export function resolveHome(filepath: string): string {
 export async function cleanupTemp(
   subtitleFile: string | null = null
 ): Promise<void> {
-  /** @global */
   const ourTempDir =
     (subtitleFile && path.dirname(subtitleFile)) || globalThis.ourTempDir
+  // @ts-ignore
   await promisify(rimraf)(ourTempDir, {
     disableGlob: true,
   })
+}
+
+export function isDebug(): boolean {
+  if (process.env?.DEBUG) {
+    return true
+  }
+  return false
 }
 
 export function init() {
