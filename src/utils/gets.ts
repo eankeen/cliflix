@@ -3,6 +3,7 @@ import path from 'path'
 import c from 'ansi-colors'
 import temp from 'temp'
 import OpenSubtitles from 'opensubtitles-api'
+import JSON5 from 'json5'
 import prompts from 'prompts'
 import torrentSearch from 'torrent-search-api'
 import fetch from 'node-fetch'
@@ -10,6 +11,16 @@ import fetch from 'node-fetch'
 import { defaultConfig } from '../config'
 import { getLangCode } from './lang'
 import { resolveHome } from '.'
+
+/**
+ * @summary Gets JSON Config
+ */
+export async function getJsonConfig(
+  configFile: string
+): Promise<typeof defaultConfig> {
+  const raw = await fs.promises.readFile(configFile, { encoding: 'utf-8' })
+  return JSON5.parse(raw)
+}
 
 export async function getTorrents(
   cfg: typeof defaultConfig,

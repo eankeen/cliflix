@@ -6,7 +6,11 @@ import { defaultConfig } from '../config'
 import { streamMovie } from './stream'
 
 export async function doInfer(argv: yargs.Arguments): Promise<void> {
-  const cfg = util.mergeConfig(argv, defaultConfig)
+  const jsonConfig = await util.getJsonConfig(
+    ((argv as unknown) as typeof defaultConfig).configFile ||
+      defaultConfig.configFile
+  )
+  const cfg = util.mergeConfig(argv, jsonConfig, defaultConfig)
 
   await util.ensureProperty(cfg, 'torrentProvider')
   await util.ensureProperty(cfg, 'moviePlayer')

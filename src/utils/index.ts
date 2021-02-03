@@ -27,9 +27,10 @@ export async function ensureConnection() {
  */
 export function mergeConfig(
   argv: yargs.Arguments,
+  jsonConfig: typeof defaultConfig,
   defaultCfg: typeof defaultConfig
 ): typeof defaultConfig {
-  return Object.assign({}, defaultCfg, argv)
+  return Object.assign({}, defaultCfg, jsonConfig, argv)
 }
 
 /**

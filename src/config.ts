@@ -36,7 +36,7 @@ const defaultConfig = {
   subtitleLanguage: '',
   subtitleLanguages: ['English', 'Spanish', 'German'],
   title: '',
-  saveMedia: false,
+  saveMedia: true,
   skipNoSubtitles: false,
   torrentListLength: 30,
   downloadDir: path.join(os.homedir(), 'Downloads'),
