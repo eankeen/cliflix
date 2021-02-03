@@ -55,6 +55,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/signal-exit@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/signal-exit/-/signal-exit-3.0.0.tgz#75e3b17660cf1f6c6cb8557675b4e680e43bbf36"
+  integrity sha512-MaJ+16SOXz0Z27EMf3d88+B6UDglq1sn140a+5X/ROLkIcEfRq0CPg+1B2efF1GXQn4n+aKH4ti2hHG4Ya+Dzg==
+
 "@types/temp@^0.8.34":
   version "0.8.34"
   resolved "https://registry.yarnpkg.com/@types/temp/-/temp-0.8.34.tgz#03e4b3cb67cbb48c425bbf54b12230fef85540ac"

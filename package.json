@@ -43,6 +43,7 @@
     "@types/node-fetch": "^2.5.8",
     "@types/parse-torrent": "^5.8.3",
     "@types/prompts": "^2.0.9",
+    "@types/signal-exit": "^3.0.0",
     "@types/temp": "^0.8.34",
     "@types/torrent-search-api": "^2.0.0",
     "@types/yargs": "^15.0.12",

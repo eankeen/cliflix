@@ -18,8 +18,8 @@ export async function ensureConnection() {
       method: 'HEAD',
     })
   } catch (err) {
-    console.error(c.red('Looks like you are offline. Exiting'))
-    process.exit(1)
+    console.error(c.blue('You are offline. Please try again later'))
+    process.exit(0)
   }
 }
 
@@ -60,7 +60,7 @@ export async function ensureProperty(
     })
 
     if (Object.keys(input).length === 0) {
-      console.info(c.yellow('Input empty. Exiting'))
+      console.info(c.red('Error: User input empty. Exiting'))
       process.exit(1)
     }
 
@@ -68,20 +68,27 @@ export async function ensureProperty(
   }
 }
 
+export function resolveHome(filepath: string): string {
+  if (filepath[0] + filepath[1] === '~/') {
+    return path.join(os.homedir(), filepath.slice(1))
+  }
+  return filepath
+}
+
 export function init() {
   temp.track()
 
-  process.on('SIGTERM', (sig) => {
+  process.on('SIGTERM', (_sig) => {
     temp.cleanupSync()
     process.exit(1)
   })
 
-  process.on('SIGINT', (sig) => {
+  process.on('SIGINT', (_sig) => {
     temp.cleanupSync()
     process.exit(1)
   })
 
-  onExit((code, signal) => {
+  onExit((_code, _signal) => {
     temp.cleanupSync()
     process.exit(1)
   })
@@ -93,11 +100,4 @@ export function init() {
   process.on('unhandledRejection', (err) => {
     console.error(err)
   })
-}
-
-export function resolveHome(filepath: string): string {
-  if (filepath[0] + filepath[1] === '~/') {
-    return path.join(os.homedir(), filepath.slice(1))
-  }
-  return filepath
 }

@@ -18,8 +18,13 @@ import { resolveHome } from '.'
 export async function getJsonConfig(
   configFile: string
 ): Promise<typeof defaultConfig> {
-  const raw = await fs.promises.readFile(configFile, { encoding: 'utf-8' })
-  return JSON5.parse(raw)
+  try {
+    const raw = await fs.promises.readFile(configFile, { encoding: 'utf-8' })
+    return JSON5.parse(raw)
+  } catch (err) {
+    console.info(c.red('Error: Could not read and parse config file. Exiting'))
+    process.exit(1)
+  }
 }
 
 export async function getTorrents(
@@ -69,7 +74,7 @@ export async function getTorrents(
     return torrents
   } catch (err) {
     console.error(
-      c.yellow(`No torrents found via "${c.bold(torrentProvider)}"`)
+      c.yellow(`Warning: No torrents found via "${c.bold(torrentProvider)}"`)
     )
 
     const nextTorrentProvider =
@@ -99,7 +104,7 @@ export async function getTorrentChoice(
   })
 
   if (Object.keys(input).length === 0) {
-    console.info(c.yellow('Input empty. Exiting'))
+    console.info(c.red('Error: Torrent object empty. Exiting'))
     process.exit(1)
   }
 
@@ -110,8 +115,7 @@ export async function getMagnets(torrent: torrentSearch.Torrent) {
   try {
     return torrentSearch.getMagnet(torrent)
   } catch (err) {
-    console.error(c.yellow('getMagent error. Exiting'))
-    console.error(err)
+    console.error(c.red('Error: Could not get magnet. Exiting'))
     process.exit(1)
   }
 }
@@ -152,7 +156,11 @@ export async function getSubtitles(
     })
     return results[Object.keys(results)[0]] || []
   } catch (err) {
-    console.error(c.red('OpenSubtitles error. Ignoring'))
+    console.error(
+      c.yellow(
+        'Warning: Could not search for subtitles with OpenSubtitles. Ignoring'
+      )
+    )
     return []
   }
 }
@@ -161,7 +169,7 @@ export async function getSubtitleFile(
   cfg: typeof defaultConfig,
   subtitle: subtitle
 ) {
-  return new Promise<string>(async (resolve, reject) => {
+  return new Promise<string>(async (resolve, _reject) => {
     let stream: fs.WriteStream
 
     const content = await (await fetch(subtitle.url)).text()
@@ -177,8 +185,9 @@ export async function getSubtitleFile(
       resolve(stream.path.toString())
     })
     stream.on('error', (err) => {
-      console.info(c.yellow('Error when downloading subtitles file. Ignoring'))
-      console.info(err)
+      console.info(
+        c.yellow('Warning: Could not download subtitles file. Ignoring')
+      )
     })
   })
 }

@@ -7,7 +7,7 @@ export async function streamMovie(
   webtorrentOptions: string[] = []
 ) {
   if (!torrent) {
-    console.error(c.red('Error: torrent parameter undefined. Exiting'))
+    console.error(c.red('Error: Torrent not defined. Exiting'))
     process.exit(1)
   }
 

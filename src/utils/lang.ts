@@ -164,7 +164,9 @@ const language = {
 
 export function getLangCode(langPretty: string) {
   if (!langPretty) {
-    console.warn(c.yellow('Warning: langPretty falsy. Returning English'))
+    console.warn(
+      c.yellow("Warning: Passed language not valid. Using 'English'")
+    )
     return 'eng'
   }
 
