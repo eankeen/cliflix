@@ -174,13 +174,17 @@ export async function getSubtitles(
 
 export async function getSubtitleFile(
   cfg: typeof defaultConfig,
-  subtitle: subtitle
+  subtitle?: subtitle
 ) {
   return new Promise<string>(async (resolve, reject) => {
     let stream: fs.WriteStream
 
-    if (cfg.skipNoSubtitles && !subtitle) {
-      resolve('')
+    if (!subtitle) {
+      if (cfg.skipNoSubtitles) {
+        resolve('')
+      } else {
+        reject(new Error('No subtitle object was provided'))
+      }
       return
     }
 
