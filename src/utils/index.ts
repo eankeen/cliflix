@@ -100,7 +100,8 @@ export function init() {
   const signals: NodeJS.Signals[] = ['SIGINT', 'SIGHUP']
   for (const signal of signals) {
     process.on(signal, async (_sig) => {
-      await cleanupTemp()
+      // If we don't catch, any error from cleanupTemp() will prevent the requested exit.
+      await cleanupTemp().catch(console.error)
 
       process.exit(1)
     })
