@@ -176,8 +176,13 @@ export async function getSubtitleFile(
   cfg: typeof defaultConfig,
   subtitle: subtitle
 ) {
-  return new Promise<string>(async (resolve, _reject) => {
+  return new Promise<string>(async (resolve, reject) => {
     let stream: fs.WriteStream
+
+    if (cfg.skipNoSubtitles && !subtitle) {
+      resolve('')
+      return
+    }
 
     const content = await (await fetch(subtitle.url)).text()
     if (cfg.saveMedia) {
@@ -208,10 +213,15 @@ export async function getSubtitleFile(
       resolve(stream.path.toString())
     })
     stream.on('error', (err) => {
-      console.info(
-        c.yellow('Warning: Could not download subtitles file. Ignoring')
-      )
-      if (isDebug()) console.error(err)
+      if (cfg.skipNoSubtitles) {
+        console.info(
+          c.yellow('Warning: Could not download subtitles file. Ignoring')
+        )
+        if (isDebug()) console.error(err)
+        resolve('')
+      } else {
+        reject(err)
+      }
     })
   })
 }
