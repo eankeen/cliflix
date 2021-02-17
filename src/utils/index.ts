@@ -81,12 +81,13 @@ export function resolveHome(filepath: string): string {
 export async function cleanupTemp(
   subtitleFile: string | null = null
 ): Promise<void> {
-  const ourTempDir =
-    (subtitleFile && path.dirname(subtitleFile)) || globalThis.ourTempDir
-  // @ts-ignore
-  await promisify(rimraf)(ourTempDir, {
-    disableGlob: true,
-  })
+  console.info('TODO: Implement cleanupTemp')
+  // const ourTempDir =
+  //   (subtitleFile && path.dirname(subtitleFile)) || globalThis.ourTempDir
+  // // @ts-ignore
+  // await promisify(rimraf)(ourTempDir, {
+  //   disableGlob: true,
+  // })
 }
 
 export function isDebug(): boolean {

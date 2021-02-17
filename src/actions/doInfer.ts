@@ -27,7 +27,10 @@ export async function doInfer(argv: yargs.Arguments): Promise<void> {
     path.dirname(subtitleFile),
     '--subtitles',
     subtitleFile,
-    `--${cfg.moviePlayer.toLowerCase()}`,
+    // TODO: cleanup
+    cfg.moviePlayer.toLowerCase() !== 'none'
+      ? ''
+      : `--${cfg.moviePlayer.toLowerCase()}`,
     ...cfg.webtorrentOptions,
   ])
   await util.cleanupTemp(subtitleFile)

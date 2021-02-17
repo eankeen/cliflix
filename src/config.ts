@@ -32,6 +32,7 @@ const defaultConfig = {
     'VLC',
     'IINA',
     'XBMC',
+    'None',
   ],
   subtitleLanguage: '',
   subtitleLanguages: ['English', 'Spanish', 'German'],
