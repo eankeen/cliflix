@@ -177,6 +177,8 @@ export async function getSubtitleFile(
   subtitle: subtitle
 ) {
   return new Promise<string>(async (resolve, _reject) => {
+    if (!subtitle) resolve('')
+
     let stream: fs.WriteStream
 
     const content = await (await fetch(subtitle.url)).text()

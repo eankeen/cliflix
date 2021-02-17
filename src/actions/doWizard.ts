@@ -22,16 +22,19 @@ export async function doWizard(argv: yargs.Arguments): Promise<void> {
   const subtitles = await util.getSubtitles(cfg, torrent)
   const subtitleFile = await util.getSubtitleFile(cfg, subtitles[0])
 
-  await streamMovie(magnet, [
-    '--out',
-    path.dirname(subtitleFile),
-    '--subtitles',
-    subtitleFile,
-    // TODO: cleanup
-    cfg.moviePlayer.toLowerCase() !== 'none'
-      ? ''
-      : `--${cfg.moviePlayer.toLowerCase()}`,
-    ...cfg.webtorrentOptions,
-  ])
+  // TODO: cleanup
+  let args: string[] = []
+  args.push('--out')
+  args.push(path.dirname(subtitleFile))
+  if (cfg.moviePlayer.toLowerCase() !== 'none') {
+    args.push(`--${cfg.moviePlayer.toLowerCase()}`)
+  }
+  if (subtitleFile) {
+    args.push('--subtitles')
+    args.push(subtitleFile)
+  }
+  args = args.concat(cfg.webtorrentOptions)
+
+  await streamMovie(magnet, args)
   await util.cleanupTemp(subtitleFile)
 }
